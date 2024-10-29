@@ -11,8 +11,8 @@ class Bird(pygame.sprite.Sprite):
         self.velocity = 0 
         self.display_surface = pygame.display.get_surface()
         self.add_time = 0
-        self.pipes_passed = 0
-
+        self.angle = 0
+        
         self.img = pygame.image.load("./img/birds/bird0.png")
     
     def move(self, delta_time):
@@ -28,6 +28,13 @@ class Bird(pygame.sprite.Sprite):
             displacement = BIRD_MAX_DISPLACEMENT
         
         self.y += displacement
+        
+        if displacement < 0:
+            self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
+            self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
+        else:
+            self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
+            self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
     
     def jump(self): 
         self.velocity = BIRD_JUMP_VELOCITY
@@ -37,4 +44,6 @@ class Bird(pygame.sprite.Sprite):
         if hitbox:
             pygame.draw.circle(self.display_surface, (255, 0, 0), (int(self.x), int(self.y)), BIRD_RADIUS)
         if img:
-            self.display_surface.blit(self.img, (int(self.x-BIRD_RADIUS-1), int(self.y-BIRD_RADIUS)))
+            img = self.img
+            rotate_img = pygame.transform.rotate(img, self.angle)
+            self.display_surface.blit(rotate_img, (int(self.x-BIRD_RADIUS-1), int(self.y-BIRD_RADIUS)))
