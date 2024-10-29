@@ -20,6 +20,15 @@ class Game:
         self.pipe_timer = 0
         self.pipes = pygame.sprite.Group()
         self.birds = pygame.sprite.Group()
+
+        self.bg_sky = pygame.image.load("./img/bg/sky.png")
+        self.bg_buildings = pygame.image.load("./img/bg/buildings.png")
+        self.bg_bush = pygame.image.load("./img/bg/bush.png")
+        self.bg_floor = pygame.image.load("./img/bg/floor.png")
+
+        self.bg_buildings_count = math.ceil(GAME_WIDTH / self.bg_buildings.get_width())
+        self.bg_bush_count = math.ceil(GAME_WIDTH / self.bg_bush.get_width())
+        self.bg_floor_count = math.ceil(GAME_WIDTH / self.bg_floor.get_width())
     
     def spawn_pipe(self):
         # top pipe
@@ -37,7 +46,7 @@ class Game:
     def check_collision(self): 
         
         for bird in self.birds:
-            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS > GAME_HEIGHT + 10:
+            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10:
                 return True  # Bird is off screen
         
         if not self.pipes:
@@ -68,7 +77,13 @@ class Game:
             Main game loop
         """
         bird = Bird(self.birds)
+
+        bg_buildings_clock = 0
+        bg_bush_clock = 0
+        bg_floor_clock = 0
+
         while True:
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -82,6 +97,9 @@ class Game:
             # delta time needed to make everything frame rate independent 
             # so, regardless of the fps, the game will be executed at the same speed.
             delta_time = self.clock.tick() / 1000
+            bg_buildings_clock += delta_time
+            bg_bush_clock += delta_time
+            bg_floor_clock += delta_time
 
             if self.game_started:
                 #start managing the pipes and ai birds
@@ -93,19 +111,54 @@ class Game:
                     self.spawn_pipe()
 
                 self.pipes.update(delta_time)
-            self.display.fill(SKY_COLOR)
+
+
+            # self.display.fill(SKY_COLOR)
+            # set sky bg
+            self.display.blit(self.bg_sky, (0,0))
+
+            for i in range(self.bg_buildings_count + 1):
+                x = i*self.bg_buildings.get_width()
+                x_dis = BG_BUILDINGS_SPEED * bg_buildings_clock / BG_MOVE_TIME
+                if x_dis > BG_BUILDINGS_WIDTH:
+                    x_dis = 0
+                    bg_buildings_clock = 0
+                y = GAME_HEIGHT - self.bg_buildings.get_height()
+                self.display.blit(self.bg_buildings, (x - x_dis, y))
+
+            # add bushes to bg
+            for i in range(self.bg_bush_count + 1):
+                x = i*self.bg_bush.get_width()
+                x_dis = BG_BUSH_SPEED * bg_bush_clock / BG_MOVE_TIME
+                if x_dis > BG_BUSH_WIDTH:
+                    x_dis = 0
+                    bg_bush_clock = 0
+                y = GAME_HEIGHT - self.bg_bush.get_height()
+                self.display.blit(self.bg_bush, (x - x_dis, y))
 
             # Render all pipes
             for pipe in self.pipes:
                 pipe.render()
             
             for bird in self.birds:
-                bird.render()
+                bird.render(False)
             
             if self.check_collision():
                 print("hit")
                 pygame.quit()
                 sys.exit()
+
+            # add floor
+            for i in range(self.bg_floor_count + 1):
+                x = i*self.bg_floor.get_width()
+                x_dis = BG_FLOOR_SPEED * bg_floor_clock / BG_MOVE_TIME
+                if x_dis > BG_FLOOR_WIDTH:
+                    x_dis = 0
+                    bg_floor_clock = 0
+                y = GAME_HEIGHT - self.bg_floor.get_height()
+                self.display.blit(self.bg_floor, (x - x_dis, y))
+
+
             pygame.display.update()
 
 if __name__ == "__main__":
