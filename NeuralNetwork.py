@@ -79,7 +79,7 @@ class NeuralNetwork:
 			for j in range(len(self.bias[i])):
 				self.bias[i][j] += round(rand.uniform(bias_range_round[0], bias_range_round[1]), bias_range_round[2])
 
-	def calc_out(self, result_round: int):
+	def forward_pass(self, result_round: int):
 		'''
 			round = number of decimals in node
 
@@ -113,6 +113,10 @@ class NeuralNetwork:
 	def get_output(self):
 		return self.layers[-1]
 
+	def prob_dis(self):
+		exp_output_sum = sum([np.exp(i) for i in self.layers[-1]])
+		return [np.exp(i)/exp_output_sum for i in self.layers[-1]]
+
 	def get_children(self, children_num, link_range_round: list, bias_range_round: list):
 		l = []
 		for i in range(children_num):
@@ -135,7 +139,7 @@ def main():
 
 	n.set_input([5,5])
 	n.skew_links_bias([-2.0,2.1,2], [-0.5,0.51,3])
-	n.calc_out(3)
+	n.forward_pass(3)
 	print(n)
 	print(n.get_output())
 	print()
