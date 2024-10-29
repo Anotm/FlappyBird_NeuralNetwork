@@ -138,10 +138,10 @@ class Game:
 
             # Render all pipes
             for pipe in self.pipes:
-                pipe.render()
+                pipe.render(False, True)
             
             for bird in self.birds:
-                bird.render(False)
+                bird.render(False, True)
             
             if self.check_collision():
                 print("hit")

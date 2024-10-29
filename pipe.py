@@ -11,6 +11,14 @@ class Pipe(pygame.sprite.Sprite):
         self.display_surface = pygame.display.get_surface()
         self.height = height
 
+        if y==0:
+            self.img = pygame.image.load("./img/pipe_flip.png")
+            self.top = True
+        else:
+            self.img = pygame.image.load("./img/pipe.png")
+            self.top = False
+
+
     def update(self, delta_time):
         # Move pipe to the left
         self.move_time += delta_time
@@ -22,5 +30,10 @@ class Pipe(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
-    def render(self):
-        pygame.draw.rect(self.display_surface, PIPE_COLOR, self.rect)
+    def render(self, hitbox, img):
+        if hitbox:
+            pygame.draw.rect(self.display_surface, PIPE_COLOR, self.rect)
+        if img:
+            x = self.rect.x
+            y = (self.height - PIPE_IMG_HEIGHT) if self.top else (self.rect.y)
+            self.display_surface.blit(self.img, (x, y))

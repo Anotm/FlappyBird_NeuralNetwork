@@ -21,6 +21,6 @@ def convertImage(filename: str):
 
 if __name__ == '__main__':
     # img_l = ["./bg/buildings.png", "./bg/bush.png"]
-    img_l = ["./birds/bird10.png"]
+    img_l = ["./pipe.png", "./pipe_flip.png"]
     for i in img_l:
         convertImage(i)
