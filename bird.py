@@ -25,7 +25,6 @@ class Bird(pygame.sprite.Sprite):
             displacement = BIRD_MAX_DISPLACEMENT
         
         self.y += displacement
-        
     
     def jump(self): 
         self.velocity = BIRD_JUMP_VELOCITY

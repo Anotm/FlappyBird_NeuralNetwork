@@ -22,17 +22,17 @@ class Game:
         self.birds = pygame.sprite.Group()
     
     def spawn_pipe(self):
-            # top pipe
-            pipe_height = random.randint(100, 250)
-            pipe_top_y = 0
-            
-            #bottom pipe
-            pipe_top_y_2 = pipe_height + FIXED_GAP_SIZE
-            pipe_height_2 = GAME_HEIGHT - pipe_top_y_2
-            
-            # Create top and bottom pipes
-            Pipe(pipe_top_y, pipe_height, self.pipes)
-            Pipe(pipe_top_y_2, pipe_height_2, self.pipes)
+        # top pipe
+        pipe_height = random.randint(100, 250)
+        pipe_top_y = 0
+        
+        #bottom pipe
+        pipe_top_y_2 = pipe_height + FIXED_GAP_SIZE
+        pipe_height_2 = GAME_HEIGHT - pipe_top_y_2
+        
+        # Create top and bottom pipes
+        Pipe(pipe_top_y, pipe_height, self.pipes)
+        Pipe(pipe_top_y_2, pipe_height_2, self.pipes)
             
     def check_collision(self): 
         
