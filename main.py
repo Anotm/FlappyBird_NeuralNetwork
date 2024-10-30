@@ -89,7 +89,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_KP_ENTER:
+                    if event.key == pygame.K_ESCAPE:
                         self.game_started = True
                         bird.jump()
                     if event.key == pygame.K_SPACE:
