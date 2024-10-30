@@ -151,7 +151,6 @@ class Game:
                 pygame.quit()
                 sys.exit()
             
-            GameDebugger.draw(self.birds, self.pipes)
 
             # add floor
             for i in range(self.bg_floor_count + 1):
@@ -163,6 +162,7 @@ class Game:
                 y = GAME_HEIGHT - self.bg_floor.get_height()
                 self.display.blit(self.bg_floor, (x - x_dis, y))
 
+            GameDebugger.draw(self.birds, self.pipes)
 
             pygame.display.update()
 
