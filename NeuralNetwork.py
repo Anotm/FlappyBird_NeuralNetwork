@@ -39,7 +39,7 @@ class NeuralNetwork:
 		            for k in range(len(self.layers[i-1])):
 		                self.links[i][j].append(0)
 
-		# --------------------------------- Links ---------------------------------
+		# --------------------------------- Bias ---------------------------------
 
 		for i in range(len(node_counts)):
 			self.bias.append([])
