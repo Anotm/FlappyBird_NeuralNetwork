@@ -4,6 +4,7 @@ import sys
 import random
 from pipe import Pipe
 from bird import Bird
+from gameDebugger import GameDebugger
 import math
 
 class Game:
@@ -29,6 +30,7 @@ class Game:
         self.bg_buildings_count = math.ceil(GAME_WIDTH / self.bg_buildings.get_width())
         self.bg_bush_count = math.ceil(GAME_WIDTH / self.bg_bush.get_width())
         self.bg_floor_count = math.ceil(GAME_WIDTH / self.bg_floor.get_width())
+
     
     def spawn_pipe(self):
         # top pipe
@@ -57,8 +59,8 @@ class Game:
 
             for bird in self.birds:
                 # Find the closest point on the rectangle to the circle
-                closest_x = max(pipe.rect.x, min(bird.x, pipe.rect.x + PIPE_WIDTH))
-                closest_y = max(pipe.rect.y, min(bird.y, pipe.rect.y + pipe.height))
+                closest_x = max(pipe.rect.x, min(bird.x, pipe.rect.x + PIPE_WIDTH - 5))
+                closest_y = max(pipe.rect.y, min(bird.y, pipe.rect.y + pipe.height - 5))
 
                 # Calculate the distance between the circle's center and this point
                 distance_x = bird.x - closest_x
@@ -139,15 +141,17 @@ class Game:
 
             # Render all pipes
             for pipe in self.pipes:
-                pipe.render(False, True)
+                pipe.render()
             
             for bird in self.birds:
-                bird.render(False, True)
+                bird.render()
             
             if self.check_collision():
                 print("hit")
                 pygame.quit()
                 sys.exit()
+            
+            GameDebugger.draw(self.birds, self.pipes)
 
             # add floor
             for i in range(self.bg_floor_count + 1):

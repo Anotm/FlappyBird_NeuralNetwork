@@ -60,10 +60,8 @@ class Bird(pygame.sprite.Sprite):
         self.velocity = BIRD_JUMP_VELOCITY
         self.time = 0
     
-    def render(self, hitbox, img):
-        if hitbox:
-            pygame.draw.circle(self.display_surface, (255, 0, 0), (int(self.x), int(self.y)), BIRD_RADIUS)
-        if img:
-            img = self.img
-            rotate_img = pygame.transform.rotate(img, self.angle)
-            self.display_surface.blit(rotate_img, (int(self.x-BIRD_RADIUS-1), int(self.y-BIRD_RADIUS)))
+    def render(self):
+        img = self.img
+        rotated_img = pygame.transform.rotate(img, self.angle)
+        rotated_rect = rotated_img.get_rect(center=(self.x, self.y))
+        self.display_surface.blit(rotated_img, rotated_rect.topleft)

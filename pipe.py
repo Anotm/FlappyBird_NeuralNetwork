@@ -10,6 +10,7 @@ class Pipe(pygame.sprite.Sprite):
         self.move_time = 0
         self.display_surface = pygame.display.get_surface()
         self.height = height
+        self.width = PIPE_WIDTH
 
         if y==0:
             self.img = pygame.image.load("./img/pipe_flip.png")
@@ -30,10 +31,7 @@ class Pipe(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
-    def render(self, hitbox, img):
-        if hitbox:
-            pygame.draw.rect(self.display_surface, PIPE_COLOR, self.rect)
-        if img:
-            x = self.rect.x
-            y = (self.height - PIPE_IMG_HEIGHT) if self.top else (self.rect.y)
-            self.display_surface.blit(self.img, (x, y))
+    def render(self):
+        x = self.rect.x
+        y = (self.height - PIPE_IMG_HEIGHT) if self.top else (self.rect.y)
+        self.display_surface.blit(self.img, (x, y))
