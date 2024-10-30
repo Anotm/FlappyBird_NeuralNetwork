@@ -15,34 +15,33 @@ class Bird(pygame.sprite.Sprite):
         
         self.img = pygame.image.load("./img/birds/bird0.png")
     
-    def moveOLD(self, delta_time):
-        self.add_time += delta_time
-        # print(self.add_time)
-        if self.add_time < 0.001: 
-            return
+    # def moveOLD(self, delta_time):
+    #     self.add_time += delta_time
+    #     # print(self.add_time)
+    #     if self.add_time < 0.001: 
+    #         return
         
-        self.time += 1
-        self.add_time = 0
-        displacement = self.velocity * self.time +  0.5 * BIRD_ACC * self.time ** 2
-        if displacement > BIRD_MAX_DISPLACEMENT:
-            displacement = BIRD_MAX_DISPLACEMENT
+    #     self.time += 1
+    #     self.add_time = 0
+    #     displacement = self.velocity * self.time +  0.5 * BIRD_ACC * self.time ** 2
+    #     if displacement > BIRD_MAX_DISPLACEMENT:
+    #         displacement = BIRD_MAX_DISPLACEMENT
         
-        self.y += displacement
+    #     self.y += displacement
         
-        if displacement < 0:
-            self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
-            self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
-        else:
-            self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
-            self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
+    #     if displacement < 0:
+    #         self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
+    #         self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
+    #     else:
+    #         self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
+    #         self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
-        a = abs(BIRD_MAX_ANGLE_UP) + abs(BIRD_MAX_ANGLE_DOWN)
-        k = 0.02
-        b = -425
-        c = BIRD_MAX_ANGLE_DOWN
-        return a * (1/(1 + math.exp(-1 * k * (-1 * self.velocity - b)))) + c
+        diff_between_min_max = abs(BIRD_MAX_ANGLE_UP) + abs(BIRD_MAX_ANGLE_DOWN)
+        intensity_of_change = 0.02 # rate of change
+        shift_start = -425
+        return diff_between_min_max * (1/(1 + math.exp(-1 * intensity_of_change * (-1 * self.velocity - shift_start)))) + BIRD_MAX_ANGLE_DOWN
 
     def move(self, delta_time):
         self.add_time += delta_time
