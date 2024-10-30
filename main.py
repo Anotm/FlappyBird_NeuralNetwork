@@ -91,6 +91,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_KP_ENTER:
                         self.game_started = True
+                        bird.jump()
                     if event.key == pygame.K_SPACE:
                         bird.jump()
 

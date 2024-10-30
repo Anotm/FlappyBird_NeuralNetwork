@@ -15,7 +15,7 @@ class Bird(pygame.sprite.Sprite):
         
         self.img = pygame.image.load("./img/birds/bird0.png")
     
-    def move(self, delta_time):
+    def moveOLD(self, delta_time):
         self.add_time += delta_time
         # print(self.add_time)
         if self.add_time < 0.001: 
@@ -35,6 +35,27 @@ class Bird(pygame.sprite.Sprite):
         else:
             self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
             self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
+
+    def __sigmoid(self):
+        # https://www.desmos.com/calculator/ranjtciy4v
+        a = abs(BIRD_MAX_ANGLE_UP) + abs(BIRD_MAX_ANGLE_DOWN)
+        k = 0.02
+        b = -425
+        c = BIRD_MAX_ANGLE_DOWN
+        return a * (1/(1 + math.exp(-1 * k * (-1 * self.velocity - b)))) + c
+
+    def move(self, delta_time):
+        self.add_time += delta_time
+        # print(self.add_time)
+        if self.add_time < 0.001: 
+            return
+            
+        self.y += min(BIRD_MAX_DISPLACEMENT, self.velocity * self.add_time)
+        self.velocity -= BIRD_ACC * self.add_time
+        self.add_time = 0
+
+        self.angle = self.__sigmoid()
+
     
     def jump(self): 
         self.velocity = BIRD_JUMP_VELOCITY
