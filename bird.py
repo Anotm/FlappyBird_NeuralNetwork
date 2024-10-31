@@ -13,7 +13,7 @@ class Bird(pygame.sprite.Sprite):
         self.add_time = 0
         self.angle = 0
         
-        self.img = pygame.image.load("./img/birds/bird10.png")
+        self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
     
     # def moveOLD(self, delta_time):
     #     self.add_time += delta_time
