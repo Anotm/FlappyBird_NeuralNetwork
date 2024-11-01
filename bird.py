@@ -4,7 +4,7 @@ import math
 from NeuralNetwork import NeuralNetwork
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, NN: NeuralNetwork = None, *groups):
+    def __init__(self, NN: NeuralNetwork, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
         self.y = BIRD_STARTING_Y
@@ -47,8 +47,11 @@ class Bird(pygame.sprite.Sprite):
     #         self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
     #         self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
 
-    def input_data(input: list):
-        pass
+    def input_data(input_data: list):
+        if not self.is_ai: 
+            return
+
+        self.network.set_input(input_data)
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v

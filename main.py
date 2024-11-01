@@ -101,7 +101,7 @@ class Game:
         pipe_bottom = self.pipes.sprites()[index_bottom]
 
         for bird in self.birds:
-            if not bird.is_dead():
+            if not bird.is_dead() and bird.is_ai():
                 while (pipe_top.rect.x + (PIPE_WIDTH/2)) < bird.x:
                     index_top += 1
                     index_bottom += 1
