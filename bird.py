@@ -4,7 +4,7 @@ import math
 from NeuralNetwork import NeuralNetwork
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, NN: NeuralNetwork, *groups):
+    def __init__(self, NN: NeuralNetwork = None, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
         self.y = BIRD_STARTING_Y
@@ -47,6 +47,9 @@ class Bird(pygame.sprite.Sprite):
     #         self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
     #         self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
 
+    def input_data(input: list):
+        pass
+
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
         diff_between_min_max = abs(BIRD_MAX_ANGLE_UP) + abs(BIRD_MAX_ANGLE_DOWN)
@@ -80,6 +83,7 @@ class Bird(pygame.sprite.Sprite):
         self.time_of_death = round(TOD, 3)
         print("Score =", self.score)
         print("Death Time =", self.time_of_death)
+        print()
 
     def is_dead(self):
         return self.dead

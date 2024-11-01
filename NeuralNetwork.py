@@ -8,9 +8,9 @@ class NeuralNetwork:
 
 			Neural Network:
 					|0|
-				|0|/    |0|
+				|0|     |0|
 				   >|0|<
-				|0|\    |0|
+				|0|     |0|
 					|0|
 			-input on left
 			-hidden layers middle
@@ -51,9 +51,9 @@ class NeuralNetwork:
 
 			Neural Network:
 					|0|
-				|1|/   \|0|
+				|1|     |0|
 				   >|0|<
-				|2|\   /|0|
+				|2|     |0|
 					|0|
 		'''
 		for index, num in enumerate(input_list):
