@@ -8,9 +8,9 @@ class NeuralNetwork:
 
 			Neural Network:
 					|0|
-				|0|/   \|0|
+				|0|/    |0|
 				   >|0|<
-				|0|\   /|0|
+				|0|\    |0|
 					|0|
 			-input on left
 			-hidden layers middle

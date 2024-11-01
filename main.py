@@ -51,7 +51,7 @@ class Game:
     def check_collision(self): 
         
         for bird in self.birds:
-            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10:
+            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10 and not bird.is_dead():
                 bird.kill(self.elps_time)
                 return True  # Bird is off screen
         
@@ -72,7 +72,7 @@ class Game:
                 distance = math.sqrt(distance_x ** 2 + distance_y ** 2)
 
                 # Return True if collision occurs for any bird-pipe pair
-                if distance <= BIRD_RADIUS:
+                if distance <= BIRD_RADIUS and not bird.is_dead():
                     bird.kill(self.elps_time)
                     return True
 
@@ -96,7 +96,8 @@ class Game:
         """
             Main game loop
         """
-        bird = Bird(self.birds)
+        birdAI = Bird(NeuralNetwork([4,2]), self.birds)
+        birdUser = Bird(None, self.birds)
 
         bg_buildings_clock = 0
         bg_bush_clock = 0
@@ -114,6 +115,10 @@ class Game:
                         bird.jump()
                     if event.key == pygame.K_SPACE:
                         bird.jump()
+                    if event.key == pygame.K_q:
+                        pygame.quit()
+                        sys.exit()
+
 
             # delta time needed to make everything frame rate independent 
             # so, regardless of the fps, the game will be executed at the same speed.
@@ -125,7 +130,8 @@ class Game:
 
             if self.game_started:
                 #start managing the pipes and ai birds
-                bird.move(delta_time)
+                for bird in self.birds:
+                    bird.move(delta_time)
                 self.pipe_timer += delta_time
                 # print(self.pipe_timer)
                 if self.pipe_timer >= 2.5:
@@ -164,12 +170,6 @@ class Game:
             
             for bird in self.birds:
                 bird.render()
-            
-            if self.check_collision():
-                print("hit")
-                pygame.quit()
-                sys.exit()
-            
 
             # add floor
             for i in range(self.bg_floor_count + 1):
@@ -180,6 +180,16 @@ class Game:
                     bg_floor_clock = 0
                 y = GAME_HEIGHT - self.bg_floor.get_height()
                 self.display.blit(self.bg_floor, (x - x_dis, y))
+            
+            self.check_collision()
+
+            all_dead = True
+            for bird in self.birds:
+                if not bird.is_dead():
+                    all_dead = False
+            if all_dead:
+                pygame.quit()
+                sys.exit()
 
             GameDebugger.draw(self.birds, self.pipes)
 

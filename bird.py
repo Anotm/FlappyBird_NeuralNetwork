@@ -4,23 +4,6 @@ import math
 from NeuralNetwork import NeuralNetwork
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, *groups):
-        super().__init__(*groups)
-        self.x = BIRD_STARTING_X
-        self.y = BIRD_STARTING_Y
-        self.time = 0
-        self.velocity = 0 
-        self.display_surface = pygame.display.get_surface()
-        self.add_time = 0
-        self.angle = 0
-        self.dead = False
-        self.score = 0
-        self.time_of_death = 0
-
-        self.is_ai = False
-        
-        self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
-
     def __init__(self, NN: NeuralNetwork, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
@@ -34,10 +17,14 @@ class Bird(pygame.sprite.Sprite):
         self.score = 0
         self.time_of_death = 0
 
-        self.is_ai = True
         self.network = NN
-        
-        self.img = pygame.image.load("./img/birds/bird_F038FF.png")
+
+        if self.network == None:
+            self.is_ai = False
+            self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
+        else:
+            self.is_ai = True
+            self.img = pygame.image.load("./img/birds/bird_F038FF.png")
     
     # def moveOLD(self, delta_time):
     #     self.add_time += delta_time
@@ -70,14 +57,19 @@ class Bird(pygame.sprite.Sprite):
     def move(self, delta_time):
         self.add_time += delta_time
         # print(self.add_time)
-        if self.add_time < 0.001: 
-            return
-            
-        self.y += min(BIRD_MAX_DISPLACEMENT, self.velocity * self.add_time)
-        self.velocity -= BIRD_ACC * self.add_time
-        self.add_time = 0
+        if not self.dead:
+            if self.add_time < 0.001: 
+                return
 
-        self.angle = self.__sigmoid()
+            self.y += min(BIRD_MAX_DISPLACEMENT, self.velocity * self.add_time)
+            self.velocity -= BIRD_ACC * self.add_time
+            self.add_time = 0
+
+            self.angle = self.__sigmoid()
+        else:
+            if self.add_time >= MOVE_TIME:
+                self.x -= PIPE_SPEED
+                self.add_time = 0
     
     def jump(self): 
         self.velocity = BIRD_JUMP_VELOCITY
