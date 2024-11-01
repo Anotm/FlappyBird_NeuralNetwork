@@ -1,19 +1,43 @@
 import pygame 
 from const import *
 import math
+from NeuralNetwork import NeuralNetwork
 
 class Bird(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
         self.y = BIRD_STARTING_Y
-        self.time = 0 
+        self.time = 0
         self.velocity = 0 
         self.display_surface = pygame.display.get_surface()
         self.add_time = 0
         self.angle = 0
+        self.dead = False
+        self.score = 0
+        self.time_of_death = 0
+
+        self.is_ai = False
         
         self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
+
+    def __init__(self, NN: NeuralNetwork, *groups):
+        super().__init__(*groups)
+        self.x = BIRD_STARTING_X
+        self.y = BIRD_STARTING_Y
+        self.time = 0
+        self.velocity = 0 
+        self.display_surface = pygame.display.get_surface()
+        self.add_time = 0
+        self.angle = 0
+        self.dead = False
+        self.score = 0
+        self.time_of_death = 0
+
+        self.is_ai = True
+        self.network = NN
+        
+        self.img = pygame.image.load("./img/birds/bird_F038FF.png")
     
     # def moveOLD(self, delta_time):
     #     self.add_time += delta_time
@@ -54,11 +78,22 @@ class Bird(pygame.sprite.Sprite):
         self.add_time = 0
 
         self.angle = self.__sigmoid()
-
     
     def jump(self): 
         self.velocity = BIRD_JUMP_VELOCITY
         self.time = 0
+
+    def kill(self, TOD):
+        self.dead = True;
+        self.time_of_death = round(TOD, 3)
+        print("Score =", self.score)
+        print("Death Time =", self.time_of_death)
+
+    def is_dead(self):
+        return self.dead
+
+    def inc_score(self):
+        self.score += 1
     
     def render(self):
         img = self.img

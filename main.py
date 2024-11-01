@@ -7,6 +7,8 @@ from bird import Bird
 from gameDebugger import GameDebugger
 import math
 
+from NeuralNetwork import NeuralNetwork
+
 class Game:
     def __init__(self) -> None:
         """Game initialization and setup
@@ -16,6 +18,7 @@ class Game:
         pygame.display.set_caption("Flappy Bird")
         self.basic_font = pygame.font.SysFont("Arial", 20)
         self.clock = pygame.time.Clock()
+        self.elps_time = 0
         
         self.game_started = False 
         self.pipe_timer = 0
@@ -49,6 +52,7 @@ class Game:
         
         for bird in self.birds:
             if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10:
+                bird.kill(self.elps_time)
                 return True  # Bird is off screen
         
         if not self.pipes:
@@ -69,10 +73,24 @@ class Game:
 
                 # Return True if collision occurs for any bird-pipe pair
                 if distance <= BIRD_RADIUS:
-                    return True  
+                    bird.kill(self.elps_time)
+                    return True
+
+            even = True
+            if not bird.is_dead() and pipe.rect.x == bird.x and even:
+                bird.inc_score()
+            even = not even
+
         
         # Return False if no collisions found
         return False
+
+    def set_bird_inputs():
+        for pipe_index in [0, 1]: 
+            pipe = self.pipes.sprites()[pipe_index]
+
+            for bird in self.birds:
+                pass
     
     def run(self) -> None:
         """
@@ -100,6 +118,7 @@ class Game:
             # delta time needed to make everything frame rate independent 
             # so, regardless of the fps, the game will be executed at the same speed.
             delta_time = self.clock.tick() / 1000
+            self.elps_time += delta_time
             bg_buildings_clock += delta_time
             bg_bush_clock += delta_time
             bg_floor_clock += delta_time
