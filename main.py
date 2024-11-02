@@ -33,6 +33,7 @@ class Game:
         self.bg_buildings_count = math.ceil(GAME_WIDTH / self.bg_buildings.get_width())
         self.bg_bush_count = math.ceil(GAME_WIDTH / self.bg_bush.get_width())
         self.bg_floor_count = math.ceil(GAME_WIDTH / self.bg_floor.get_width())
+        self.highest_scores = []
 
     def spawn_pipe(self):
         # top pipe
@@ -49,7 +50,7 @@ class Game:
             
     def check_collision(self): 
         for bird in self.birds:
-            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10 and not bird.is_dead:
+            if (bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10) and not bird.is_dead:
                 bird.kill(self.elps_time)
                 # return True  # Bird is off screen
         
@@ -108,12 +109,12 @@ class Game:
                     pipe_top = self.pipes.sprites()[index_top]
                     pipe_bottom = self.pipes.sprites()[index_bottom]
 
-                bird_height = GAME_HEIGHT - bird.y - BG_FLOOR_HEIGHT
+                bird_height = GAME_HEIGHT - bird.y - BG_FLOOR_HEIGHT                
                 bird_pipes_dis = pipe_bottom.rect.x + (PIPE_WIDTH/2) - bird.x
                 bird_top_pipe_dis = pipe_top.height - bird.y
                 bird_bottom_pipe_dis = pipe_bottom.rect.y - bird.y
 
-            bird.run_neural_network([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
+                bird.run_neural_network([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
 
     def draw_screen(self, bg_buildings_clock, bg_bush_clock, bg_floor_clock):
         # set sky bg
@@ -163,12 +164,14 @@ class Game:
         """
             Main game loop
         """
-        birdAI = Bird(NeuralNetwork([4,2]), self.birds)
-        birdUser = Bird(None, self.birds)
-
+        num_gen = 5
+        num_birds = 100
+        
+            
         bg_buildings_clock = 0
         bg_bush_clock = 0
         bg_floor_clock = 0
+        
 
         while True:
 
@@ -198,9 +201,14 @@ class Game:
             bg_buildings_clock += delta_time
             bg_bush_clock += delta_time
             bg_floor_clock += delta_time
+            
 
             if self.game_started:
                 #start managing the pipes and ai birds
+                if not self.birds:
+                    for _ in range(num_birds):
+                        Bird(NeuralNetwork([4,4,2]), self.birds)
+                
                 for bird in self.birds:
                     bird.move(delta_time)
                 self.pipe_timer += delta_time
@@ -222,8 +230,20 @@ class Game:
                 if not bird.is_dead:
                     all_dead = False
             if all_dead:
-                pygame.quit()
-                sys.exit()
+                for bird in self.birds:
+                    
+                    if bird.score not in self.highest_scores and len(self.highest_scores) < 4:
+                        self.highest_scores.append(bird.score)
+                    
+                    if bird.score > min(self.highest_scores):
+                        self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.score
+                    
+                
+                for bird in self.birds:
+                    for score in self.highest_scores:
+                        if bird.score >= score:
+                            bird.get_child(num_gen)
+                        
 
             GameDebugger.draw(self.birds, self.pipes)
 

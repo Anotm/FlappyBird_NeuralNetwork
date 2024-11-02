@@ -74,7 +74,7 @@ class NeuralNetwork:
 					if self.links[i][j][k] != None:
 						self.links[i][j][k] += round(rand.uniform(link_range_round[0], link_range_round[1]), link_range_round[2])
 
-		# --------------------------------- Links ---------------------------------
+		# --------------------------------- Bias ---------------------------------
 		for i in range(len(self.bias)):
 			for j in range(len(self.bias[i])):
 				self.bias[i][j] += round(rand.uniform(bias_range_round[0], bias_range_round[1]), bias_range_round[2])

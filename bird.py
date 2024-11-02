@@ -2,6 +2,7 @@ import pygame
 from const import *
 import math
 from NeuralNetwork import NeuralNetwork
+import random
 
 class Bird(pygame.sprite.Sprite):
     def __init__(self, NN: NeuralNetwork, *groups):
@@ -25,6 +26,7 @@ class Bird(pygame.sprite.Sprite):
         else:
             self.is_ai = True
             self.img = pygame.image.load("./img/birds/bird_F038FF.png")
+            r = random.randint(1, 10)
             self.network.skew_links_bias([-5,5,5], [-5,5,5])
     
     '''
@@ -63,6 +65,13 @@ class Bird(pygame.sprite.Sprite):
         if max(jump, not_jump) == jump:
             self.jump()
 
+
+    def get_child(self, generation_num):
+        if not self.is_ai:
+            return
+
+        self.network.get_children(25, [-5, 5, 5], [-5, 5, 5])
+
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
         diff_between_min_max = abs(BIRD_MAX_ANGLE_UP) + abs(BIRD_MAX_ANGLE_DOWN)
@@ -92,11 +101,12 @@ class Bird(pygame.sprite.Sprite):
         self.time = 0
 
     def kill(self, TOD):
-        self.is_dead = True;
+        self.is_dead = True
         self.time_of_death = round(TOD, 3)
         print("Score =", self.score)
         print("Death Time =", self.time_of_death)
         print()
+        
 
     def inc_score(self):
         self.score += 1
