@@ -2,7 +2,7 @@ import pygame
 from const import BIRD_RADIUS
 
 class GameDebugger:
-    is_acitve = True
+    is_acitve = False
 
 
     @classmethod

@@ -33,7 +33,10 @@ class Game:
         self.bg_buildings_count = math.ceil(GAME_WIDTH / self.bg_buildings.get_width())
         self.bg_bush_count = math.ceil(GAME_WIDTH / self.bg_bush.get_width())
         self.bg_floor_count = math.ceil(GAME_WIDTH / self.bg_floor.get_width())
+
+        self.num_gen = 1
         self.highest_scores = []
+        self.next_networks = []
 
     def spawn_pipe(self):
         # top pipe
@@ -51,7 +54,7 @@ class Game:
     def check_collision(self): 
         for bird in self.birds:
             if (bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10) and not bird.is_dead:
-                bird.kill(self.elps_time)
+                bird.suspend(self.elps_time)
                 # return True  # Bird is off screen
         
         if not self.pipes:
@@ -73,7 +76,7 @@ class Game:
 
                 # Return True if collision occurs for any bird-pipe pair
                 if distance <= BIRD_RADIUS and not bird.is_dead:
-                    bird.kill(self.elps_time)
+                    bird.suspend(self.elps_time)
                     # return True
 
         # Return False if no collisions found
@@ -163,18 +166,16 @@ class Game:
     def run(self) -> None:
         """
             Main game loop
-        """
-        num_gen = 5
-        num_birds = 100
-        
+        """        
             
         bg_buildings_clock = 0
         bg_bush_clock = 0
         bg_floor_clock = 0
-        
+
+        for _ in range(MAX_NUM_BIRDS):
+            Bird(NeuralNetwork([4,4,2]), self.birds)
 
         while True:
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -191,7 +192,6 @@ class Game:
                         pygame.quit()
                         sys.exit()
 
-
             self.update_neural_networks()
 
             # delta time needed to make everything frame rate independent 
@@ -202,7 +202,6 @@ class Game:
             bg_bush_clock += delta_time
             bg_floor_clock += delta_time
             
-
             if self.game_started:
                 #start managing the pipes and ai birds
                 if not self.birds:
@@ -229,24 +228,42 @@ class Game:
             for bird in self.birds:
                 if not bird.is_dead:
                     all_dead = False
+
             if all_dead:
+                if self.num_gen == MAX_NUM_GEN:
+                    pygame.quit()
+                    sys.exit()
                 for bird in self.birds:
-                    
-                    if bird.score not in self.highest_scores and len(self.highest_scores) < 4:
-                        self.highest_scores.append(bird.score)
-                    
-                    if bird.score > min(self.highest_scores):
-                        self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.score
-                    
+                    if bird.time_of_death not in self.highest_scores and len(self.highest_scores) < 4:
+                        self.highest_scores.append(bird.time_of_death)
+
+                    if bird.time_of_death > min(self.highest_scores):
+                        self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.time_of_death
                 
+                print(self.highest_scores)
+
+                self.next_networks = []
                 for bird in self.birds:
-                    for score in self.highest_scores:
-                        if bird.score >= score:
-                            bird.get_child(num_gen)
-                        
+                    if bird.time_of_death >= min(self.highest_scores):
+                        for network in bird.get_childs(self.num_gen):
+                            if not len(self.next_networks) > MAX_NUM_BIRDS:
+                                self.next_networks.append(network)
 
-            GameDebugger.draw(self.birds, self.pipes)
+                self.birds.empty()
+                self.pipes.empty()
+                
+                self.num_gen += 1
+                self.highest_scores = []
+                self.elps_time = 0
+                bg_buildings_clock = 0
+                bg_bush_clock = 0
+                bg_floor_clock = 0 
+                self.pipe_timer = 0
 
+                for network in self.next_networks:
+                    Bird(network, self.birds)
+
+            # GameDebugger.draw(self.birds, self.pipes)
             pygame.display.update()
 
 if __name__ == "__main__":

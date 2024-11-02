@@ -66,11 +66,11 @@ class Bird(pygame.sprite.Sprite):
             self.jump()
 
 
-    def get_child(self, generation_num):
+    def get_childs(self, num_gen):
         if not self.is_ai:
             return
 
-        self.network.get_children(25, [-5, 5, 5], [-5, 5, 5])
+        return self.network.get_children(25, [-5/pow(2,num_gen), 5/pow(2,num_gen), 5], [-5/pow(2,num_gen), 5/pow(2,num_gen), 5])
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
@@ -100,13 +100,12 @@ class Bird(pygame.sprite.Sprite):
         self.velocity = BIRD_JUMP_VELOCITY
         self.time = 0
 
-    def kill(self, TOD):
+    def suspend(self, TOD):
         self.is_dead = True
         self.time_of_death = round(TOD, 3)
-        print("Score =", self.score)
-        print("Death Time =", self.time_of_death)
-        print()
-        
+        # print("Score =", self.score)
+        # print("Death Time =", self.time_of_death)
+        # print()
 
     def inc_score(self):
         self.score += 1
