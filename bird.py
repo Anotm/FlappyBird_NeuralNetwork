@@ -13,7 +13,7 @@ class Bird(pygame.sprite.Sprite):
         self.display_surface = pygame.display.get_surface()
         self.add_time = 0
         self.angle = 0
-        self.dead = False
+        self.is_dead = False
         self.score = 0
         self.time_of_death = 0
 
@@ -25,33 +25,43 @@ class Bird(pygame.sprite.Sprite):
         else:
             self.is_ai = True
             self.img = pygame.image.load("./img/birds/bird_F038FF.png")
+            self.network.skew_links_bias([-5,5,5], [-5,5,5])
     
-    # def moveOLD(self, delta_time):
-    #     self.add_time += delta_time
-    #     # print(self.add_time)
-    #     if self.add_time < 0.001: 
-    #         return
+    '''
+    def moveOLD(self, delta_time):
+        self.add_time += delta_time
+        # print(self.add_time)
+        if self.add_time < 0.001: 
+            return
         
-    #     self.time += 1
-    #     self.add_time = 0
-    #     displacement = self.velocity * self.time +  0.5 * BIRD_ACC * self.time ** 2
-    #     if displacement > BIRD_MAX_DISPLACEMENT:
-    #         displacement = BIRD_MAX_DISPLACEMENT
+        self.time += 1
+        self.add_time = 0
+        displacement = self.velocity * self.time +  0.5 * BIRD_ACC * self.time ** 2
+        if displacement > BIRD_MAX_DISPLACEMENT:
+            displacement = BIRD_MAX_DISPLACEMENT
         
-    #     self.y += displacement
+        self.y += displacement
         
-    #     if displacement < 0:
-    #         self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
-    #         self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
-    #     else:
-    #         self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
-    #         self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
+        if displacement < 0:
+            self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
+            self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
+        else:
+            self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
+            self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
+    '''
 
-    def input_data(input_data: list):
+    def run_neural_network(self, input_data: list):
         if not self.is_ai: 
             return
 
         self.network.set_input(input_data)
+        self.network.forward_pass(4)
+        output = self.network.get_output()
+        jump = output[0]
+        not_jump = output[1]
+
+        if max(jump, not_jump) == jump:
+            self.jump()
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
@@ -63,7 +73,7 @@ class Bird(pygame.sprite.Sprite):
     def move(self, delta_time):
         self.add_time += delta_time
         # print(self.add_time)
-        if not self.dead:
+        if not self.is_dead:
             if self.add_time < 0.001: 
                 return
 
@@ -82,14 +92,11 @@ class Bird(pygame.sprite.Sprite):
         self.time = 0
 
     def kill(self, TOD):
-        self.dead = True;
+        self.is_dead = True;
         self.time_of_death = round(TOD, 3)
         print("Score =", self.score)
         print("Death Time =", self.time_of_death)
         print()
-
-    def is_dead(self):
-        return self.dead
 
     def inc_score(self):
         self.score += 1

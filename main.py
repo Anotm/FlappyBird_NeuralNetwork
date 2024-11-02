@@ -49,7 +49,7 @@ class Game:
             
     def check_collision(self): 
         for bird in self.birds:
-            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10 and not bird.is_dead():
+            if bird.y - BIRD_RADIUS < - 10 or bird.y + BIRD_RADIUS + BG_FLOOR_HEIGHT > GAME_HEIGHT + 10 and not bird.is_dead:
                 bird.kill(self.elps_time)
                 # return True  # Bird is off screen
         
@@ -71,7 +71,7 @@ class Game:
                 distance = math.sqrt(distance_x ** 2 + distance_y ** 2)
 
                 # Return True if collision occurs for any bird-pipe pair
-                if distance <= BIRD_RADIUS and not bird.is_dead():
+                if distance <= BIRD_RADIUS and not bird.is_dead:
                     bird.kill(self.elps_time)
                     # return True
 
@@ -86,12 +86,12 @@ class Game:
             pipes_passed = 0;
             for pipe_index in [0, 1]:
                 pipe = self.pipes.sprites()[pipe_index]
-                if not bird.is_dead() and pipe.rect.x + PIPE_WIDTH == bird.x:
+                if not bird.is_dead and pipe.rect.x + PIPE_WIDTH == bird.x:
                     pipes_passed += 1
             if pipes_passed > 0:
                 bird.inc_score()
 
-    def set_ai_inputs(self):
+    def update_neural_networks(self):
         if not self.pipes:
             return
 
@@ -101,7 +101,7 @@ class Game:
         pipe_bottom = self.pipes.sprites()[index_bottom]
 
         for bird in self.birds:
-            if not bird.is_dead() and bird.is_ai():
+            if not bird.is_dead and bird.is_ai:
                 while (pipe_top.rect.x + (PIPE_WIDTH/2)) < bird.x:
                     index_top += 1
                     index_bottom += 1
@@ -113,7 +113,7 @@ class Game:
                 bird_top_pipe_dis = pipe_top.height - bird.y
                 bird_bottom_pipe_dis = pipe_bottom.rect.y - bird.y
 
-            # bird.input_data([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
+            bird.run_neural_network([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
 
     def draw_screen(self, bg_buildings_clock, bg_bush_clock, bg_floor_clock):
         # set sky bg
@@ -189,7 +189,7 @@ class Game:
                         sys.exit()
 
 
-            self.set_ai_inputs()
+            self.update_neural_networks()
 
             # delta time needed to make everything frame rate independent 
             # so, regardless of the fps, the game will be executed at the same speed.
@@ -214,11 +214,12 @@ class Game:
             bg_buildings_clock, bg_bush_clock, bg_floor_clock = self.draw_screen(bg_buildings_clock, bg_bush_clock, bg_floor_clock)
             
             self.check_collision()
+
             self.set_score()
 
             all_dead = True
             for bird in self.birds:
-                if not bird.is_dead():
+                if not bird.is_dead:
                     all_dead = False
             if all_dead:
                 pygame.quit()
