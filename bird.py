@@ -105,7 +105,7 @@ class Bird(pygame.sprite.Sprite):
     def suspend(self, TOD):
         self.is_dead = True
         self.time_of_death = round(TOD, 3)
-        print("Score =", self.score, " -- Death Time =", self.time_of_death)
+        # print("Score =", self.score, " -- Death Time =", self.time_of_death)
         # print()
 
     def inc_score(self):

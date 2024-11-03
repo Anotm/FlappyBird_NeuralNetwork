@@ -192,8 +192,6 @@ class Game:
                         pygame.quit()
                         sys.exit()
 
-            self.update_neural_networks()
-
             # delta time needed to make everything frame rate independent 
             # so, regardless of the fps, the game will be executed at the same speed.
             delta_time = self.clock.tick() / 1000
@@ -203,22 +201,16 @@ class Game:
             bg_floor_clock += delta_time
             
             if self.game_started:
-                #start managing the pipes and ai birds
-                if not self.birds:
-                    for _ in range(num_birds):
-                        Bird(NeuralNetwork([4,4,2]), self.birds)
-                
+                self.update_neural_networks()
                 for bird in self.birds:
                     bird.move(delta_time)
                 self.pipe_timer += delta_time
-                # print(self.pipe_timer)
                 if self.pipe_timer >= 2.5:
                     self.pipe_timer = 0
                     self.spawn_pipe()
 
                 self.pipes.update(delta_time)
 
-            bg_buildings_clock, bg_bush_clock, bg_floor_clock = self.draw_screen(bg_buildings_clock, bg_bush_clock, bg_floor_clock)
             
             self.check_collision()
 
@@ -234,7 +226,7 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 for bird in self.birds:
-                    if bird.time_of_death not in self.highest_scores and len(self.highest_scores) < 4:
+                    if len(self.highest_scores) < 4:
                         self.highest_scores.append(bird.time_of_death)
 
                     if bird.time_of_death > min(self.highest_scores):
@@ -257,7 +249,7 @@ class Game:
 
                 self.pipes = pygame.sprite.Group()
                 self.birds = pygame.sprite.Group()
-                
+                print("birds after delete: ", self.birds)
                 self.num_gen += 1
                 self.highest_scores = []
                 self.elps_time = 0
@@ -268,14 +260,16 @@ class Game:
 
                 print(len(self.next_networks))
                 print()
+                
                 for network in self.next_networks:
                     Bird(network, self.birds)
-
+                print("birds added: ", self.birds)
+                    
+                self.spawn_pipe()
                 for bird in self.birds:
                     bird.jump()
 
-                self.spawn_pipe()
-
+            bg_buildings_clock, bg_bush_clock, bg_floor_clock = self.draw_screen(bg_buildings_clock, bg_bush_clock, bg_floor_clock)
             # GameDebugger.draw(self.birds, self.pipes)
             pygame.display.update()
 

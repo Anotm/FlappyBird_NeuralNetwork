@@ -67,7 +67,6 @@ class NeuralNetwork:
 		the random number generated will be added to the already existing values
 		'''
 		# --------------------------------- Links ---------------------------------
-
 		for i in range(len(self.links)):
 			for j in range(len(self.links[i])):
 				for k in range(len(self.links[i][j])):
