@@ -230,7 +230,7 @@ class Game:
                     all_dead = False
 
             if all_dead:
-                if self.num_gen == MAX_NUM_GEN:
+                if self.num_gen >= MAX_NUM_GEN:
                     pygame.quit()
                     sys.exit()
                 for bird in self.birds:
@@ -239,18 +239,24 @@ class Game:
 
                     if bird.time_of_death > min(self.highest_scores):
                         self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.time_of_death
-                
-                print(self.highest_scores)
+
+                self.highest_scores.sort(reverse = True)
+                print("Highest Scores =", self.highest_scores)
 
                 self.next_networks = []
-                for bird in self.birds:
-                    if bird.time_of_death >= min(self.highest_scores):
-                        for network in bird.get_childs(self.num_gen):
-                            if not len(self.next_networks) > MAX_NUM_BIRDS:
+                for t in self.highest_scores:
+                    match = False
+                    for bird in self.birds:
+                        if bird.time_of_death == t:
+                            for network in bird.get_childs(self.num_gen):
                                 self.next_networks.append(network)
+                            match = True
+                        if match:
+                            break
 
-                self.birds.empty()
-                self.pipes.empty()
+
+                self.pipes = pygame.sprite.Group()
+                self.birds = pygame.sprite.Group()
                 
                 self.num_gen += 1
                 self.highest_scores = []
@@ -260,8 +266,15 @@ class Game:
                 bg_floor_clock = 0 
                 self.pipe_timer = 0
 
+                print(len(self.next_networks))
+                print()
                 for network in self.next_networks:
                     Bird(network, self.birds)
+
+                for bird in self.birds:
+                    bird.jump()
+
+                self.spawn_pipe()
 
             # GameDebugger.draw(self.birds, self.pipes)
             pygame.display.update()

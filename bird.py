@@ -69,8 +69,10 @@ class Bird(pygame.sprite.Sprite):
     def get_childs(self, num_gen):
         if not self.is_ai:
             return
-
-        return self.network.get_children(25, [-5/pow(2,num_gen), 5/pow(2,num_gen), 5], [-5/pow(2,num_gen), 5/pow(2,num_gen), 5])
+        factor = 100
+        rounding = 2
+        max_min = MAX_NUM_GEN - num_gen
+        return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
@@ -103,8 +105,7 @@ class Bird(pygame.sprite.Sprite):
     def suspend(self, TOD):
         self.is_dead = True
         self.time_of_death = round(TOD, 3)
-        # print("Score =", self.score)
-        # print("Death Time =", self.time_of_death)
+        print("Score =", self.score, " -- Death Time =", self.time_of_death)
         # print()
 
     def inc_score(self):
