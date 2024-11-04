@@ -2,7 +2,7 @@ import numpy as np
 import random as rand
 
 class NeuralNetwork:
-	def __init__(self, node_counts: list):
+	def __init__(self, node_counts: list=None, input_layers: list=None, input_links: list=None, input_bias: list=None):
 		'''
 			input: [2,3,2]
 
@@ -16,6 +16,16 @@ class NeuralNetwork:
 			-hidden layers middle
 			-output on right
 		'''
+
+		if node_counts == None and input_layers != None and input_links != None and input_bias != None:
+			self.layers = input_layers
+			self.links = input_links
+			self.bias = input_bias
+			return
+
+		elif node_counts == None:
+			return
+
 
 		self.layers = []
 		self.links = []
@@ -125,11 +135,16 @@ class NeuralNetwork:
 			# print()
 		return l
 
+	def copy(self):
+		n = NeuralNetwork(None, self.layers, self.links, self.bias)
+		return n
+
 	def __repr__(self):
 		return "NeuralNetwork()"
 	
 	def __str__(self):
-		return "Layers =" + str(self.layers) + "\n" + "Links =" + str(self.links) + "\n" + "Bias =" + str(self.bias)
+		return "Layers = " + str(self.layers) + "\n" + "Links = " + str(self.links) + "\n" + "Bias = " + str(self.bias)
+
 
 def main():
 	n = NeuralNetwork([2,3,2])

@@ -72,7 +72,12 @@ class Bird(pygame.sprite.Sprite):
         factor = 100
         rounding = 2
         max_min = MAX_NUM_GEN - num_gen
-        return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
+        children = []
+        for i in range(25):
+            children.append(self.network.copy())
+            children[i].skew_links_bias([-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
+        return children
+        # return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
@@ -116,3 +121,6 @@ class Bird(pygame.sprite.Sprite):
         rotated_img = pygame.transform.rotate(img, self.angle)
         rotated_rect = rotated_img.get_rect(center=(self.x, self.y))
         self.display_surface.blit(rotated_img, rotated_rect.topleft)
+
+    def __str__(self):
+        return "is_ai = " + str(self.is_ai) + "\n" + "Score = " + str(self.score) + " -- Death Time = " + str(self.time_of_death) + "\n" + "Neural Network:" + "\n" + str(self.network)

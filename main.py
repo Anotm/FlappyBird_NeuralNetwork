@@ -117,6 +117,8 @@ class Game:
                 bird_top_pipe_dis = pipe_top.height - bird.y
                 bird_bottom_pipe_dis = pipe_bottom.rect.y - bird.y
 
+                # print([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
+
                 bird.run_neural_network([bird_height, bird_pipes_dis, bird_top_pipe_dis, bird_bottom_pipe_dis])
 
     def draw_screen(self, bg_buildings_clock, bg_bush_clock, bg_floor_clock):
@@ -240,8 +242,13 @@ class Game:
                     match = False
                     for bird in self.birds:
                         if bird.time_of_death == t:
+                            print(bird)
+                            print()
                             for network in bird.get_childs(self.num_gen):
                                 self.next_networks.append(network)
+                                print(network)
+                                print()
+                            print()
                             match = True
                         if match:
                             break
@@ -259,6 +266,8 @@ class Game:
                 self.pipe_timer = 0
 
                 print(len(self.next_networks))
+                print()
+                print()
                 print()
                 
                 for network in self.next_networks:
