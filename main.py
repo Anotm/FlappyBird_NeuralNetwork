@@ -38,6 +38,8 @@ class Game:
         self.num_gen = 1
         self.highest_scores = []
         self.next_networks = []
+
+        self.current_score = 0
         
         # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
         self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "F30F00", "74896E"]
@@ -98,6 +100,11 @@ class Game:
                     pipes_passed += 1
             if pipes_passed > 0:
                 bird.inc_score()
+
+        for bird in self.birds:
+            if not bird.is_dead:
+                self.current_score = bird.score
+                break
 
     def update_neural_networks(self):
         if not self.pipes:
@@ -167,8 +174,10 @@ class Game:
             y = GAME_HEIGHT - self.bg_floor.get_height()
             self.display.blit(self.bg_floor, (x - x_dis, y))
 
-        gen_txt = self.basic_font.render(f"Generation#: {self.num_gen}", True, (0, 0, 0))
-        self.display.blit(gen_txt, (10, 10))
+        display_gen_txt = self.basic_font.render(f"Generation Num: {self.num_gen}", True, (234, 252, 219))
+        display_score_txt = self.basic_font.render(f"Score: {self.current_score}", True, (234, 252, 219))
+        self.display.blit(display_gen_txt, (10, 10))
+        self.display.blit(display_score_txt, (10, 30))
     
         return (bg_buildings_clock, bg_bush_clock, bg_floor_clock)
     
@@ -244,7 +253,8 @@ class Game:
                         self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.time_of_death
 
                 self.highest_scores.sort(reverse = True)
-                Logger.info("Highest Scores =", self.highest_scores)
+                Logger.info("Highest Scores (TOD) = ", self.highest_scores)
+                Logger.info("Highest Scores (Pipes) = ", self.current_score)
 
                 self.next_networks = []
                 for t in self.highest_scores:
