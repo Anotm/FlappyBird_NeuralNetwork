@@ -74,7 +74,7 @@ class Bird(pygame.sprite.Sprite):
             return
         factor = 100
         rounding = 8
-        max_min = (MAX_NUM_GEN/(num_gen+1)) / 100
+        max_min = (MAX_NUM_GEN/(num_gen+1)) / 500
         children = []
         for i in range(25):
             children.append(self.network.copy())

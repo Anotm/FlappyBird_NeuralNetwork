@@ -27,7 +27,7 @@ class Logger:
 
     """
     log_level = LogLevels.INFO
-    is_active = True
+    print_in_console = True
     log_file_path = 'log.txt'
     
     @classmethod
@@ -51,7 +51,7 @@ class Logger:
         Args:
             msg (str): the message to print
         """
-        if cls.is_active:
+        if cls.print_in_console:
             print(msg)
         
         cls._write_to_file(msg)

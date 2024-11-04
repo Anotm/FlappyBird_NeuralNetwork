@@ -1,5 +1,7 @@
 import numpy as np
 import random as rand
+import copy
+
 
 class NeuralNetwork:
 	def __init__(self, node_counts: list=None, input_layers: list=None, input_links: list=None, input_bias: list=None):
@@ -136,7 +138,12 @@ class NeuralNetwork:
 		return l
 
 	def copy(self):
-		n = NeuralNetwork(None, self.layers, self.links, self.bias)
+		n = NeuralNetwork(
+			None,
+			copy.deepcopy(self.layers),
+			copy.deepcopy(self.links),
+			copy.deepcopy(self.bias)
+		)
 		return n
 
 	def __repr__(self):

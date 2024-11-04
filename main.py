@@ -17,7 +17,7 @@ class Game:
         pygame.init()
         self.display = pygame.display.set_mode((GAME_WIDTH, GAME_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
-        self.basic_font = pygame.font.SysFont("Arial", 20)
+        self.basic_font = pygame.font.SysFont("Arial", 20, bold=True)
         self.clock = pygame.time.Clock()
         self.elps_time = 0
         
@@ -38,6 +38,9 @@ class Game:
         self.num_gen = 1
         self.highest_scores = []
         self.next_networks = []
+        
+        # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
+        self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "AB654C", "74896E"]
 
     def spawn_pipe(self):
         # top pipe
@@ -164,6 +167,9 @@ class Game:
             y = GAME_HEIGHT - self.bg_floor.get_height()
             self.display.blit(self.bg_floor, (x - x_dis, y))
 
+        gen_txt = self.basic_font.render(f"Generation#: {self.num_gen}", True, (0, 0, 0))
+        self.display.blit(gen_txt, (10, 10))
+    
         return (bg_buildings_clock, bg_bush_clock, bg_floor_clock)
     
     def run(self) -> None:
@@ -176,7 +182,7 @@ class Game:
         bg_floor_clock = 0
 
         for _ in range(MAX_NUM_BIRDS):
-            Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
+            Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[self.num_gen - 1], self.birds)
         
         Logger.clear_log_file()
 
@@ -275,7 +281,7 @@ class Game:
                 # print()
                 
                 for network in self.next_networks:
-                    Bird(network, "F038FF", self.birds)
+                    Bird(network, self.generation_colors[self.num_gen - 1], self.birds)
 
                 # for _ in range(MAX_NUM_BIRDS//2):
                 #     Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
