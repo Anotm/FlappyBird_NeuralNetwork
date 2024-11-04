@@ -1,5 +1,6 @@
 
 from PIL import Image
+from logger import Logger
  
 def convertImage(filename: str):
     img = Image.open(filename)
@@ -17,7 +18,7 @@ def convertImage(filename: str):
  
     img.putdata(newData)
     img.save(filename, "PNG")
-    print("Successful")
+    Logger.debug("Successful")
 
 if __name__ == '__main__':
     # img_l = ["./bg/buildings.png", "./bg/bush.png"]

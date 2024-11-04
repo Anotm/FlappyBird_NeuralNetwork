@@ -1,1 +1,2 @@
 pygame==2.6.1
+ordered_enum==0.0.7

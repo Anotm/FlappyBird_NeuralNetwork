@@ -4,6 +4,7 @@ import math
 from NeuralNetwork import NeuralNetwork
 import random
 import time
+from logger import Logger
 
 class Bird(pygame.sprite.Sprite):
     def __init__(self, NN: NeuralNetwork, color: str, *groups):
@@ -78,8 +79,8 @@ class Bird(pygame.sprite.Sprite):
         for i in range(25):
             children.append(self.network.copy())
             children[i].skew_links_bias([-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
-            print(children[i])
-            print()
+            Logger.info(children[i])
+            # print()
             time.sleep(1/1000)
         return children
         # return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
@@ -115,7 +116,7 @@ class Bird(pygame.sprite.Sprite):
     def suspend(self, TOD):
         self.is_dead = True
         self.time_of_death = round(TOD, 3)
-        # print("Score =", self.score, " -- Death Time =", self.time_of_death)
+        Logger.debug("Score =", self.score, " -- Death Time =", self.time_of_death)
         # print()
 
     def inc_score(self):

@@ -6,6 +6,7 @@ from pipe import Pipe
 from bird import Bird
 from gameDebugger import GameDebugger
 import math
+from logger import Logger
 
 from NeuralNetwork import NeuralNetwork
 
@@ -176,6 +177,8 @@ class Game:
 
         for _ in range(MAX_NUM_BIRDS):
             Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
+        
+        Logger.clear_log_file()
 
         while True:
             for event in pygame.event.get():
@@ -223,12 +226,7 @@ class Game:
                     all_dead = False
 
             if all_dead:
-                print()
-                print()
-                print()
-                print()
-                print()
-                print("--------------GENERATION:", self.num_gen)
+                Logger.info("--------------GENERATION:", self.num_gen)
                 if self.num_gen >= MAX_NUM_GEN:
                     pygame.quit()
                     sys.exit()
@@ -240,20 +238,20 @@ class Game:
                         self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.time_of_death
 
                 self.highest_scores.sort(reverse = True)
-                print("Highest Scores =", self.highest_scores)
+                Logger.info("Highest Scores =", self.highest_scores)
 
                 self.next_networks = []
                 for t in self.highest_scores:
                     match = False
                     for bird in self.birds:
                         if bird.time_of_death == t:
-                            print(bird)
-                            print()
+                            Logger.info(bird)
+                            # print()
                             for network in bird.get_childs(self.num_gen):
                                 self.next_networks.append(network)
                                 # print(network)
                                 # print()
-                            print()
+                            # print()
                             match = True
                         if match:
                             break
@@ -271,10 +269,10 @@ class Game:
                 bg_floor_clock = 0 
                 self.pipe_timer = 2.5
 
-                print(len(self.next_networks))
-                print()
-                print()
-                print()
+                Logger.info(len(self.next_networks))
+                # print()
+                # print()
+                # print()
                 
                 for network in self.next_networks:
                     Bird(network, "F038FF", self.birds)
@@ -282,7 +280,7 @@ class Game:
                 # for _ in range(MAX_NUM_BIRDS//2):
                 #     Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
 
-                print("birds added: ", self.birds)
+                Logger.info("birds added: ", self.birds)
                     
                 # self.spawn_pipe()
                 for bird in self.birds:
