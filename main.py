@@ -175,7 +175,7 @@ class Game:
         bg_floor_clock = 0
 
         for _ in range(MAX_NUM_BIRDS):
-            Bird(NeuralNetwork([4,4,2]), self.birds)
+            Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
 
         while True:
             for event in pygame.event.get():
@@ -213,7 +213,6 @@ class Game:
 
                 self.pipes.update(delta_time)
 
-            
             self.check_collision()
 
             self.set_score()
@@ -224,6 +223,12 @@ class Game:
                     all_dead = False
 
             if all_dead:
+                print()
+                print()
+                print()
+                print()
+                print()
+                print("--------------GENERATION:", self.num_gen)
                 if self.num_gen >= MAX_NUM_GEN:
                     pygame.quit()
                     sys.exit()
@@ -246,8 +251,8 @@ class Game:
                             print()
                             for network in bird.get_childs(self.num_gen):
                                 self.next_networks.append(network)
-                                print(network)
-                                print()
+                                # print(network)
+                                # print()
                             print()
                             match = True
                         if match:
@@ -256,14 +261,15 @@ class Game:
 
                 self.pipes = pygame.sprite.Group()
                 self.birds = pygame.sprite.Group()
-                print("birds after delete: ", self.birds)
+                # print("birds after delete: ", self.birds)
+
                 self.num_gen += 1
                 self.highest_scores = []
                 self.elps_time = 0
                 bg_buildings_clock = 0
                 bg_bush_clock = 0
                 bg_floor_clock = 0 
-                self.pipe_timer = 0
+                self.pipe_timer = 2.5
 
                 print(len(self.next_networks))
                 print()
@@ -271,10 +277,14 @@ class Game:
                 print()
                 
                 for network in self.next_networks:
-                    Bird(network, self.birds)
+                    Bird(network, "F038FF", self.birds)
+
+                # for _ in range(MAX_NUM_BIRDS//2):
+                #     Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
+
                 print("birds added: ", self.birds)
                     
-                self.spawn_pipe()
+                # self.spawn_pipe()
                 for bird in self.birds:
                     bird.jump()
 

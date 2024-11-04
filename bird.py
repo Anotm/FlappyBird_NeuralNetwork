@@ -3,9 +3,10 @@ from const import *
 import math
 from NeuralNetwork import NeuralNetwork
 import random
+import time
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, NN: NeuralNetwork, *groups):
+    def __init__(self, NN: NeuralNetwork, color: str, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
         self.y = BIRD_STARTING_Y
@@ -25,9 +26,9 @@ class Bird(pygame.sprite.Sprite):
             self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
         else:
             self.is_ai = True
-            self.img = pygame.image.load("./img/birds/bird_F038FF.png")
+            self.img = pygame.image.load("./img/birds/bird_"+color+".png")
             r = random.randint(1, 10)
-            self.network.skew_links_bias([-5,5,5], [-5,5,5])
+            self.network.skew_links_bias([-0.05,0.05,8], [-0.05,0.05,8])
     
     '''
     def moveOLD(self, delta_time):
@@ -64,18 +65,22 @@ class Bird(pygame.sprite.Sprite):
 
         if max(jump, not_jump) == jump:
             self.jump()
+            # print("flap")
 
 
     def get_childs(self, num_gen):
         if not self.is_ai:
             return
         factor = 100
-        rounding = 2
-        max_min = MAX_NUM_GEN - num_gen
+        rounding = 8
+        max_min = (MAX_NUM_GEN/(num_gen+1)) / 100
         children = []
         for i in range(25):
             children.append(self.network.copy())
             children[i].skew_links_bias([-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
+            print(children[i])
+            print()
+            time.sleep(1/1000)
         return children
         # return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
 
