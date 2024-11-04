@@ -40,7 +40,7 @@ class Game:
         self.next_networks = []
         
         # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
-        self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "AB654C", "74896E"]
+        self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "F30F00", "74896E"]
 
     def spawn_pipe(self):
         # top pipe
