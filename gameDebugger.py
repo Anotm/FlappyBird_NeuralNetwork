@@ -7,7 +7,9 @@ class GameDebugger:
 
     @classmethod
     def draw(cls, birds, pipes):
-
+        if not cls.is_acitve:
+            return
+        
         for bird in birds:
             pygame.draw.circle(bird.display_surface, (225, 0, 0), (int(bird.x), int(bird.y)), radius=BIRD_RADIUS,  width=2)
 
