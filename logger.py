@@ -27,7 +27,7 @@ class Logger:
 
     """
     log_level = LogLevels.INFO
-    print_in_console = True
+    print_in_console = False
     log_file_path = 'log.txt'
     
     @classmethod
