@@ -191,7 +191,7 @@ class Game:
         bg_floor_clock = 0
 
         for _ in range(MAX_NUM_BIRDS):
-            Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[self.num_gen - 1], self.birds)
+            Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[(self.num_gen - 1)%5], self.birds)
         
         Logger.clear_log_file()
 
@@ -291,7 +291,7 @@ class Game:
                 # print()
                 
                 for network in self.next_networks:
-                    Bird(network, self.generation_colors[self.num_gen - 1], self.birds)
+                    Bird(network, self.generation_colors[(self.num_gen - 1)%5], self.birds)
 
                 # for _ in range(MAX_NUM_BIRDS//2):
                 #     Bird(NeuralNetwork(NN_LAYOUT), "762367", self.birds)
