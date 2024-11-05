@@ -1,7 +1,9 @@
 import numpy as np
 import random as rand
 import copy
-
+import pickle
+from logger import Logger
+from const import NETWORK_SAVE_NAME
 
 class NeuralNetwork:
 	def __init__(self, node_counts: list=None, input_layers: list=None, input_links: list=None, input_bias: list=None):
@@ -42,14 +44,14 @@ class NeuralNetwork:
 		# --------------------------------- Links ---------------------------------
 
 		for i in range(len(self.layers)):
-		    self.links.append([])
-		    for j in range(len(self.layers[i])):
-		        if i == 0:
-		            self.links[i].append([None])
-		        else:
-		            self.links[i].append([])
-		            for k in range(len(self.layers[i-1])):
-		                self.links[i][j].append(0)
+			self.links.append([])
+			for j in range(len(self.layers[i])):
+				if i == 0:
+					self.links[i].append([None])
+				else:
+					self.links[i].append([])
+					for k in range(len(self.layers[i-1])):
+						self.links[i][j].append(0)
 
 		# --------------------------------- Bias ---------------------------------
 
@@ -133,8 +135,6 @@ class NeuralNetwork:
 		for i in range(children_num):
 			l.append(self)
 			l[i].skew_links_bias(link_range_round, bias_range_round)
-			# print(l[i])
-			# print()
 		return l
 
 	def copy(self):
@@ -145,6 +145,15 @@ class NeuralNetwork:
 			copy.deepcopy(self.bias)
 		)
 		return n
+
+	def save_network(self):
+		with open(NETWORK_SAVE_NAME, "wb") as f:
+			pickle.dump((self.layers, self.links, self.bias), f)
+
+	def load_save_network(self):
+		with open(NETWORK_SAVE_NAME, "rb") as f:
+			self.layers, self.links, self.bias = pickle.load(f)
+		return self
 
 	def __repr__(self):
 		return "NeuralNetwork()"

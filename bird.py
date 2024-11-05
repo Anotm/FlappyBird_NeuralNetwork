@@ -7,7 +7,7 @@ import time
 from logger import Logger
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, NN: NeuralNetwork, color: str, *groups):
+    def __init__(self, NN: NeuralNetwork, color: str, is_training: bool, *groups):
         super().__init__(*groups)
         self.x = BIRD_STARTING_X
         self.y = BIRD_STARTING_Y
@@ -24,36 +24,13 @@ class Bird(pygame.sprite.Sprite):
 
         if self.network == None:
             self.is_ai = False
-            self.img = pygame.image.load("./img/birds/bird_D5BE24.png")
+            self.img = pygame.image.load("./img/bird_D5BE24.png")
         else:
             self.is_ai = True
             self.img = pygame.image.load("./img/birds/bird_"+color+".png")
-            r = random.randint(1, 10)
-            self.network.skew_links_bias([-0.05,0.05,8], [-0.05,0.05,8])
+            if is_training:
+                self.network.skew_links_bias([-0.05,0.05,8], [-0.05,0.05,8])
     
-    '''
-    def moveOLD(self, delta_time):
-        self.add_time += delta_time
-        # print(self.add_time)
-        if self.add_time < 0.001: 
-            return
-        
-        self.time += 1
-        self.add_time = 0
-        displacement = self.velocity * self.time +  0.5 * BIRD_ACC * self.time ** 2
-        if displacement > BIRD_MAX_DISPLACEMENT:
-            displacement = BIRD_MAX_DISPLACEMENT
-        
-        self.y += displacement
-        
-        if displacement < 0:
-            self.angle += max(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_UP - self.angle), BIRD_INC_ANGLE)
-            self.angle = min(self.angle, BIRD_MAX_ANGLE_UP)
-        else:
-            self.angle -= abs(min(BIRD_ANGLE_ACC * (BIRD_MAX_ANGLE_DOWN - self.angle), -BIRD_INC_ANGLE))
-            self.angle = max(self.angle, BIRD_MAX_ANGLE_DOWN)
-    '''
-
     def run_neural_network(self, input_data: list):
         if not self.is_ai: 
             return
@@ -66,13 +43,11 @@ class Bird(pygame.sprite.Sprite):
 
         if max(jump, not_jump) == jump:
             self.jump()
-            # print("flap")
 
 
     def get_childs(self, num_gen):
         if not self.is_ai:
             return
-        factor = 100
         rounding = 8
         max_min = (MAX_NUM_GEN/(num_gen+1)) / 100
         children = []
@@ -80,10 +55,8 @@ class Bird(pygame.sprite.Sprite):
             children.append(self.network.copy())
             children[i].skew_links_bias([-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
             Logger.info(children[i])
-            # print()
             time.sleep(1/1000)
         return children
-        # return self.network.get_children(25, [-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
 
     def __sigmoid(self):
         # https://www.desmos.com/calculator/ranjtciy4v
@@ -94,7 +67,6 @@ class Bird(pygame.sprite.Sprite):
 
     def move(self, delta_time):
         self.add_time += delta_time
-        # print(self.add_time)
         if not self.is_dead:
             if self.add_time < 0.001: 
                 return
@@ -117,7 +89,6 @@ class Bird(pygame.sprite.Sprite):
         self.is_dead = True
         self.time_of_death = round(TOD, 3)
         Logger.debug("Score =", self.score, " -- Death Time =", self.time_of_death)
-        # print()
 
     def inc_score(self):
         self.score += 1
