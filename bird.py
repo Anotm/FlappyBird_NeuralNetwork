@@ -51,7 +51,7 @@ class Bird(pygame.sprite.Sprite):
         rounding = 8
         max_min = (MAX_NUM_GEN/(num_gen+1)) / 100
         children = []
-        for i in range(25):
+        for i in range(NUMBER_CHILDREN_PER_BIRD):
             children.append(self.network.copy())
             children[i].skew_links_bias([-1*max_min, max_min, rounding], [-1*max_min, max_min, rounding])
             Logger.info(children[i])
