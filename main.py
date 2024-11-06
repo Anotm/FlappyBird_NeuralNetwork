@@ -84,10 +84,17 @@ class Game:
         
         if not self.pipes:
             return
+        
+        index_top = 0
+        index_bottom = 1
+        pipe_top = self.pipes.sprites()[index_top]
 
         for bird in self.birds:
-            even = False
-            for pipe_index in [0, 1]: 
+            while (pipe_top.rect.x + PIPE_WIDTH) < bird.x:
+                index_top += 1
+                index_bottom += 1
+                pipe_top = self.pipes.sprites()[index_top]
+            for pipe_index in [index_top, index_bottom]: 
                 pipe = self.pipes.sprites()[pipe_index]
 
                 # Find the closest point on the rectangle to the circle
@@ -320,16 +327,18 @@ class Game:
             bg_floor_clock += delta_time
             
             if self.game_started:
+                multiplier =  (9/10) ** (self.high_pipe_score // 10)
+                print(multiplier)
                 if self.ai_playing:
                     self.update_neural_networks()
                 for bird in self.birds:
-                    bird.move(delta_time)
+                    bird.move(delta_time, multiplier)
                 self.pipe_timer += delta_time
-                if self.pipe_timer >= PIPE_SPAWN_TIME:
+                if self.pipe_timer >= PIPE_SPAWN_TIME * multiplier:
                     self.pipe_timer = 0
                     self.spawn_pipe()
 
-                self.pipes.update(delta_time)
+                self.pipes.update(delta_time, multiplier)
 
             self.check_collision()
 

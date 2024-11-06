@@ -64,7 +64,7 @@ class Bird(pygame.sprite.Sprite):
         shift_start = -425
         return diff_between_min_max * (1/(1 + math.exp(-1 * intensity_of_change * (-1 * self.velocity - shift_start)))) + BIRD_MAX_ANGLE_DOWN
 
-    def move(self, delta_time):
+    def move(self, delta_time, speed):
         self.add_time += delta_time
         if not self.is_dead:
             if self.add_time < 0.001: 
@@ -76,7 +76,7 @@ class Bird(pygame.sprite.Sprite):
 
             self.angle = self.__sigmoid()
         else:
-            if self.add_time >= MOVE_TIME:
+            if self.add_time >= MOVE_TIME * speed:
                 self.x -= PIPE_SPEED
                 self.add_time = 0
     

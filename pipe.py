@@ -20,10 +20,10 @@ class Pipe(pygame.sprite.Sprite):
             self.top = False
 
 
-    def update(self, delta_time):
+    def update(self, delta_time, speed):
         # Move pipe to the left
         self.move_time += delta_time
-        if self.move_time >= MOVE_TIME:
+        if self.move_time >= MOVE_TIME * speed:
             self.rect.x -= PIPE_SPEED
             self.move_time = 0
 
