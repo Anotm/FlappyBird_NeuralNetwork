@@ -7,7 +7,7 @@ from bird import Bird
 from gameDebugger import GameDebugger
 import math
 from logger import Logger
-
+from button import Button
 from NeuralNetwork import NeuralNetwork
 
 class Game:
@@ -17,7 +17,9 @@ class Game:
         pygame.init()
         self.display = pygame.display.set_mode((GAME_WIDTH, GAME_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
-        self.basic_font = pygame.font.SysFont("Arial", 20, bold=True)
+        self.basic_font = pygame.font.Font("Pixeboy-z8XGD.ttf", 32)
+        self.large_font = pygame.font.Font("Pixeboy-z8XGD.ttf", 80)
+
         self.clock = pygame.time.Clock()
         self.elps_time = 0
         
@@ -43,6 +45,13 @@ class Game:
         self.best_bird = None
         self.training = False
         self.ai_playing = False
+        
+        button_size = (250, 50)
+        self.home_screen_buttons = [
+            Button("Start Training", position=(GAME_WIDTH // 2 - button_size[0] // 2, 130), size=button_size, command=self.launch_training, font=self.basic_font),
+            Button("Run AI Gameplay", position=(GAME_WIDTH // 2 - button_size[0] // 2, 210), size=button_size, command=self.launch_ai_gameplay, font=self.basic_font),
+            Button("Play Game", position=(GAME_WIDTH // 2 - button_size[0] // 2, 290), size=button_size, command=self.play_game, font=self.basic_font)
+        ]
         
         # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
         self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "F30F00", "74896E"]
@@ -175,14 +184,58 @@ class Game:
                 bg_floor_clock = 0
             y = GAME_HEIGHT - self.bg_floor.get_height()
             self.display.blit(self.bg_floor, (x - x_dis, y))
+        
+        if not self.game_started:
+            for button in self.home_screen_buttons:
+                button.draw()
 
         if self.training:
             display_gen_txt = self.basic_font.render(f"Generation Num: {self.num_gen}", True, (234, 252, 219))
             self.display.blit(display_gen_txt, (10, 10))
-        display_score_txt = self.basic_font.render(f"High Score: {self.high_pipe_score}", True, (234, 252, 219))
-        self.display.blit(display_score_txt, (10, 30))
-    
+            display_score_txt = self.basic_font.render(f"High Score: {self.high_pipe_score}", True, (234, 252, 219))
+            self.display.blit(display_score_txt, (10, 30))
+        else:
+            border_color = (84, 55, 69)  
+            display_score_txt = self.large_font.render(f"{self.high_pipe_score}", True, (234, 252, 219))
+            border_offsets = [(-3, -3), (-3, 3), (3, -3), (3, 3)]
+            for offset in border_offsets:
+                border_text = self.large_font.render(f"{self.high_pipe_score}", True, border_color)
+                self.display.blit(border_text, (GAME_WIDTH // 2 - border_text.get_width() // 2 + offset[0], 10 + offset[1]))
+            self.display.blit(display_score_txt, (GAME_WIDTH // 2 - display_score_txt.get_width() // 2, 10))
+        
         return (bg_buildings_clock, bg_bush_clock, bg_floor_clock)
+    
+    def launch_training(self):
+        # training
+        Logger.info("Training active")
+        self.training = True
+        for _ in range(MAX_NUM_BIRDS):
+            Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[(self.num_gen - 1)%5], self.training, self.birds)
+        self.game_started = True
+        self.spawn_pipe()
+        for bird in self.birds:
+            bird.jump()
+    
+    def launch_ai_gameplay(self):
+        Logger.info("AI bird active")
+        # play with one bird ai on the best network trained
+        self.game_started = True
+        self.ai_playing = True
+        self.spawn_pipe()
+        nn = NeuralNetwork(NN_LAYOUT).load_save_network()
+        Logger.info(nn)
+        Bird(nn, self.generation_colors[0], self.training, self.birds)
+        for bird in self.birds:
+            bird.jump()
+    
+    def play_game(self):
+        # real user player
+        Logger.info("Player bird active")
+        self.game_started = True
+        self.spawn_pipe()
+        Bird(None, self.generation_colors[0], self.training, self.birds)
+        for bird in self.birds:
+            bird.jump()
     
     def run(self) -> None:
         """
@@ -197,39 +250,20 @@ class Game:
 
         while True:
             for event in pygame.event.get():
+                if not self.game_started:
+                    for button in self.home_screen_buttons:
+                        button.check_click(event)
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
-                        # training
-                        Logger.info("Training active")
-                        self.training = True
-                        for _ in range(MAX_NUM_BIRDS):
-                            Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[(self.num_gen - 1)%5], self.training, self.birds)
-                        self.game_started = True
-                        self.spawn_pipe()
-                        for bird in self.birds:
-                            bird.jump()
-                    if event.key == pygame.K_2:
-                        Logger.info("AI bird active")
-                        # play with one bird ai on the best network trained
-                        self.game_started = True
-                        self.ai_playing = True
-                        self.spawn_pipe()
-                        nn = NeuralNetwork(NN_LAYOUT).load_save_network()
-                        Logger.info(nn)
-                        Bird(nn, self.generation_colors[0], self.training, self.birds)
-                        for bird in self.birds:
-                            bird.jump()
-                    if event.key == pygame.K_3:
-                        # real user player
-                        Logger.info("Player bird active")
-                        self.game_started = True
-                        self.spawn_pipe()
-                        Bird(None, self.generation_colors[0], self.training, self.birds)
-                        for bird in self.birds:
-                            bird.jump()
+                    if not self.game_started:
+                        if event.key == pygame.K_1:
+                            self.launch_training()
+                        if event.key == pygame.K_2:
+                            self.launch_ai_gameplay()
+                        if event.key == pygame.K_3:
+                            self.play_game()
                     if event.key == pygame.K_SPACE:
                         for bird in self.birds:
                             bird.jump()
@@ -303,7 +337,6 @@ class Game:
                                 match = True
                             if match:
                                 break
-
 
                     self.pipes = pygame.sprite.Group()
                     self.birds = pygame.sprite.Group()

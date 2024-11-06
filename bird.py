@@ -2,7 +2,6 @@ import pygame
 from const import *
 import math
 from NeuralNetwork import NeuralNetwork
-import random
 import time
 from logger import Logger
 
