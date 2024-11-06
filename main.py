@@ -9,11 +9,15 @@ import math
 from logger import Logger
 from button import Button
 from NeuralNetwork import NeuralNetwork
+from enum import Enum
+
+class GameType(Enum):
+    TRAINING = "training"
+    AI_GAMEPLAY = "AI gameplay"
+    USER_GAMEPLAY = "user gameplay"
 
 class Game:
     def __init__(self) -> None:
-        """Game initialization and setup
-        """
         pygame.init()
         self.display = pygame.display.set_mode((GAME_WIDTH, GAME_HEIGHT))
         pygame.display.set_caption("Flappy Bird")
@@ -52,6 +56,9 @@ class Game:
             Button("Run AI Gameplay", position=(GAME_WIDTH // 2 - button_size[0] // 2, 210), size=button_size, command=self.launch_ai_gameplay, font=self.basic_font),
             Button("Play Game", position=(GAME_WIDTH // 2 - button_size[0] // 2, 290), size=button_size, command=self.play_game, font=self.basic_font)
         ]
+
+        self.return_button = Button("Return to Main Menu", position=(MODAL_X + (MODAL_WIDTH - 300) // 2, MODAL_Y + MODAL_HEIGHT - 80), size=(300, 50), command=self.return_to_main_menu, font=self.basic_font)
+        self.game_type = ""
         
         # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
         self.generation_colors = ["762367", "F038FF" ,"FFD9DA", "F30F00", "74896E"]
@@ -208,6 +215,7 @@ class Game:
     def launch_training(self):
         # training
         Logger.info("Training active")
+        self.game_type = GameType.TRAINING.value
         self.training = True
         for _ in range(MAX_NUM_BIRDS):
             Bird(NeuralNetwork(NN_LAYOUT), self.generation_colors[(self.num_gen - 1)%5], self.training, self.birds)
@@ -219,6 +227,7 @@ class Game:
     def launch_ai_gameplay(self):
         Logger.info("AI bird active")
         # play with one bird ai on the best network trained
+        self.game_type = GameType.AI_GAMEPLAY.value
         self.game_started = True
         self.ai_playing = True
         self.spawn_pipe()
@@ -231,17 +240,45 @@ class Game:
     def play_game(self):
         # real user player
         Logger.info("Player bird active")
+        self.game_type = GameType.USER_GAMEPLAY.value
         self.game_started = True
         self.spawn_pipe()
         Bird(None, self.generation_colors[0], self.training, self.birds)
         for bird in self.birds:
             bird.jump()
+
+    def draw_end_modal(self):
+        pygame.draw.rect(self.display, (0, 0, 0), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT)) # modal
+        pygame.draw.rect(self.display, (234, 252, 219), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT), 3) # border
+
+        game_type_text = self.basic_font.render(f"Game Type: {self.game_type}", True, (234, 252, 219))
+        self.display.blit(game_type_text, (MODAL_X + 20, MODAL_Y + 30))
+
+        score_text = self.basic_font.render(f"Score: {self.high_pipe_score}", True, (234, 252, 219))
+        self.display.blit(score_text, (MODAL_X + 20, MODAL_Y + 80))
+
+        self.return_button.draw()
+
+    def return_to_main_menu(self):
+        self.game_started = False
+        self.training = False
+        self.ai_playing = False
+        self.pipes = pygame.sprite.Group()
+        self.birds = pygame.sprite.Group()
+        self.num_gen = MAX_NUM_GEN
+        self.highest_scores = []
+        self.elps_time = 0
+        self.pipe_timer = 0
+        self.game_type = ""
+    
+    def birds_all_dead(self) -> bool:
+        all_dead = True
+        for bird in self.birds:
+            if not bird.is_dead:
+                all_dead = False
+        return all_dead
     
     def run(self) -> None:
-        """
-            Main game loop
-        """        
-            
         bg_buildings_clock = 0
         bg_bush_clock = 0
         bg_floor_clock = 0
@@ -253,6 +290,9 @@ class Game:
                 if not self.game_started:
                     for button in self.home_screen_buttons:
                         button.check_click(event)
+                else:
+                    if self.birds_all_dead() and not self.training and self.game_started:
+                        self.return_button.check_click(event)
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
@@ -295,13 +335,10 @@ class Game:
 
             self.set_score()
 
-            if self.training:
-                all_dead = True
-                for bird in self.birds:
-                    if not bird.is_dead:
-                        all_dead = False
+            
 
-                if all_dead:
+            if self.training:
+                if self.birds_all_dead():
                     Logger.info("--------------GENERATION:", self.num_gen)
                     for bird in self.birds:
                         if not self.best_bird:
@@ -361,6 +398,9 @@ class Game:
 
             bg_buildings_clock, bg_bush_clock, bg_floor_clock = self.draw_screen(bg_buildings_clock, bg_bush_clock, bg_floor_clock)
             GameDebugger.draw(self.birds, self.pipes)
+            
+            if self.birds_all_dead() and not self.training and self.game_started:
+                self.draw_end_modal()
             pygame.display.update()
 
 if __name__ == "__main__":

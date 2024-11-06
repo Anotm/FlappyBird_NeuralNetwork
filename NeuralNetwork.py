@@ -26,7 +26,6 @@ class NeuralNetwork:
 			self.links = input_links
 			self.bias = input_bias
 			return
-
 		elif node_counts == None:
 			return
 
