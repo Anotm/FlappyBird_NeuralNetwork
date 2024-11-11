@@ -50,11 +50,14 @@ class Game:
         self.training = False
         self.ai_playing = False
         
-        button_size = (250, 50)
+        button_size = (150, 50)
+        logo_size = (500, 120)
         self.home_screen_buttons = [
-            Button("Start Training", position=(GAME_WIDTH // 2 - button_size[0] // 2, 130), size=button_size, command=self.launch_training, font=self.basic_font),
-            Button("Run AI Gameplay", position=(GAME_WIDTH // 2 - button_size[0] // 2, 210), size=button_size, command=self.launch_ai_gameplay, font=self.basic_font),
-            Button("Play Game", position=(GAME_WIDTH // 2 - button_size[0] // 2, 290), size=button_size, command=self.play_game, font=self.basic_font)
+            Button(is_img=True, filename="./img/logo.png", position=(GAME_WIDTH // 2 - logo_size[0] // 2, GAME_HEIGHT // 2 - logo_size[1]), command=self.launch_training),
+
+            Button(is_img=True, filename="./img/button_train.png", position=(GAME_WIDTH//2 - 3 * button_size[0]//2 - 25, GAME_HEIGHT//2 + button_size[1]//2), command=self.launch_training),
+            Button(is_img=True, filename="./img/button_run_ai.png", position=(GAME_WIDTH//2 - button_size[0]//2, GAME_HEIGHT//2 + button_size[1]//2), command=self.launch_ai_gameplay),
+            Button(is_img=True, filename="./img/button_play.png", position=(GAME_WIDTH//2 + button_size[0]//2 + 25, GAME_HEIGHT//2 + button_size[1]//2), command=self.play_game)
         ]
 
         self.return_button = Button("Return to Main Menu", position=(MODAL_X + (MODAL_WIDTH - 300) // 2, MODAL_Y + MODAL_HEIGHT - 80), size=(300, 50), command=self.return_to_main_menu, font=self.basic_font)
