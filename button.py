@@ -4,8 +4,10 @@ class Button:
     def __init__(self, is_img:bool=False, filename:str="./img/button_bg.png", text:str="", position:tuple=(0,0), size:tuple=(250, 50), command=None, font=None, font_size=24):
         
         self.is_img=is_img
+        self.img_rect = None
         if self.is_img:
             self.img = pygame.image.load(filename)
+            self.img_rect = self.img.get_rect(topleft=position)
 
         else:
             self.text = text
@@ -19,6 +21,7 @@ class Button:
 
         self.position = position
         self.command = command
+        
         
         self.display = pygame.display.get_surface()
         self.surface = pygame.Surface(size)
@@ -42,7 +45,7 @@ class Button:
     def check_click(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.is_img:
-                if self.img.collidepoint(event.pos):
+                if self.img_rect.collidepoint(event.pos):
                     self.command()
             else:
                 if self.rect.collidepoint(event.pos):
