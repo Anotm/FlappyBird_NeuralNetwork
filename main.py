@@ -282,11 +282,10 @@ class Game:
         self.game_type = ""
     
     def birds_all_dead(self) -> bool:
-        all_dead = True
         for bird in self.birds:
             if not bird.is_dead:
-                all_dead = False
-        return all_dead
+                return False
+        return True
     
     def run(self) -> None:
         bg_buildings_clock = 0
@@ -331,8 +330,8 @@ class Game:
             
             if self.game_started:
                 multiplier =  (9/10) ** (self.high_pipe_score // 10)
-                print(multiplier)
-                if self.ai_playing:
+                # print(multiplier)
+                if self.ai_playing or self.training:
                     self.update_neural_networks()
                 for bird in self.birds:
                     bird.move(delta_time, multiplier)
@@ -347,25 +346,24 @@ class Game:
 
             self.set_score()
 
-            
-
             if self.training:
                 if self.birds_all_dead():
+                    Logger.info("--------------------DEAD")
                     Logger.info("--------------GENERATION:", self.num_gen)
                     for bird in self.birds:
-                        if not self.best_bird:
+                        if not self.best_bird: # if best bird not set
                             self.best_bird = bird
                         
-                        if bird.score > self.best_bird.score:
+                        if bird.score > self.best_bird.score: # updating best bird
                             self.best_bird = bird
                         
-                        if len(self.highest_scores) < 4:
+                        if len(self.highest_scores) < 4: # if list doesnt contain 4 items
                             self.highest_scores.append(bird.time_of_death)
 
-                        if bird.time_of_death > min(self.highest_scores):
+                        if bird.time_of_death > min(self.highest_scores): # updating best scores
                             self.highest_scores[self.highest_scores.index(min(self.highest_scores))] = bird.time_of_death
                                     
-                    if self.num_gen >= MAX_NUM_GEN:
+                    if self.num_gen >= MAX_NUM_GEN: # quite if training completed
                         print(self.best_bird)
                         self.best_bird.network.save_network()
                         pygame.quit()
@@ -375,6 +373,7 @@ class Game:
                     Logger.info("Highest Scores (TOD) = ", self.highest_scores)
                     Logger.info("Highest Scores (Pipes) = ", self.high_pipe_score)
 
+                    # generate new child bird networks from best bird from previouse gen
                     self.next_networks = []
                     for t in self.highest_scores:
                         match = False
@@ -387,11 +386,14 @@ class Game:
                             if match:
                                 break
 
+                    # remove all pipes and birds
                     self.pipes = pygame.sprite.Group()
                     self.birds = pygame.sprite.Group()
 
+                    # reset variables
                     self.num_gen += 1
                     self.highest_scores = []
+                    self.high_pipe_score = 0
                     self.elps_time = 0
                     bg_buildings_clock = 0
                     bg_bush_clock = 0
@@ -400,11 +402,13 @@ class Game:
 
                     Logger.info(len(self.next_networks))
                     
+                    # create new birds using created networks
                     for network in self.next_networks:
                         Bird(network, self.generation_colors[(self.num_gen - 1)%5], self.training, self.birds)
 
                     Logger.info("birds added: ", self.birds)
-                        
+                    
+                    # have all birds jump
                     for bird in self.birds:
                         bird.jump()
 
