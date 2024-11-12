@@ -52,15 +52,19 @@ class Game:
         
         button_size = (150, 50)
         logo_size = (500, 120)
-        self.home_screen_buttons = [
-            Button(is_img=True, filename="./img/logo.png", position=(GAME_WIDTH // 2 - logo_size[0] // 2, GAME_HEIGHT // 2 - logo_size[1]), command=self.launch_training),
 
+        self.home_screen_buttons = [
+            Button(is_img=True, filename="./img/logo.png", position=(GAME_WIDTH // 2 - logo_size[0] // 2, GAME_HEIGHT // 2 - logo_size[1]), command=self.play_game),
             Button(is_img=True, filename="./img/button_train.png", position=(GAME_WIDTH//2 - 3 * button_size[0]//2 - 25, GAME_HEIGHT//2 + button_size[1]//2), command=self.launch_training),
             Button(is_img=True, filename="./img/button_run_ai.png", position=(GAME_WIDTH//2 - button_size[0]//2, GAME_HEIGHT//2 + button_size[1]//2), command=self.launch_ai_gameplay),
             Button(is_img=True, filename="./img/button_play.png", position=(GAME_WIDTH//2 + button_size[0]//2 + 25, GAME_HEIGHT//2 + button_size[1]//2), command=self.play_game)
         ]
 
-        self.return_button = Button("Return to Main Menu", position=(MODAL_X + (MODAL_WIDTH - 300) // 2, MODAL_Y + MODAL_HEIGHT - 80), size=(300, 50), command=self.return_to_main_menu, font=self.basic_font)
+        self.end_screen_buttons = [
+            Button(is_img=True, filename="./img/logo_game_over.png", position=(GAME_WIDTH // 2 - logo_size[0] // 2, GAME_HEIGHT // 2 - logo_size[1]), command=self.return_to_main_menu),
+            Button(is_img=True, filename="./img/button_return.png", position=(GAME_WIDTH//2 - button_size[0]//2, GAME_HEIGHT//2 + button_size[1]//2), command=self.return_to_main_menu)
+        ]
+
         self.game_type = ""
         
         # TODO: make this more automated, needs to be in respect to MAX_NUM_GEN
@@ -258,16 +262,17 @@ class Game:
             bird.jump()
 
     def draw_end_modal(self):
-        pygame.draw.rect(self.display, (0, 0, 0), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT)) # modal
-        pygame.draw.rect(self.display, (234, 252, 219), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT), 3) # border
+        # pygame.draw.rect(self.display, (0, 0, 0), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT)) # modal
+        # pygame.draw.rect(self.display, (234, 252, 219), (MODAL_X, MODAL_Y, MODAL_WIDTH, MODAL_HEIGHT), 3) # border
 
-        game_type_text = self.basic_font.render(f"Game Type: {self.game_type}", True, (234, 252, 219))
-        self.display.blit(game_type_text, (MODAL_X + 20, MODAL_Y + 30))
+        # game_type_text = self.basic_font.render(f"Game Type: {self.game_type}", True, (234, 252, 219))
+        # self.display.blit(game_type_text, (MODAL_X + 20, MODAL_Y + 30))
 
-        score_text = self.basic_font.render(f"Score: {self.high_pipe_score}", True, (234, 252, 219))
-        self.display.blit(score_text, (MODAL_X + 20, MODAL_Y + 80))
+        # score_text = self.basic_font.render(f"Score: {self.high_pipe_score}", True, (234, 252, 219))
+        # self.display.blit(score_text, (MODAL_X + 20, MODAL_Y + 80))
 
-        self.return_button.draw()
+        for button in self.end_screen_buttons:
+            button.draw()
 
     def return_to_main_menu(self):
         self.game_started = False
@@ -301,7 +306,8 @@ class Game:
                         button.check_click(event)
                 else:
                     if self.birds_all_dead() and not self.training and self.game_started:
-                        self.return_button.check_click(event)
+                        for button in self.end_screen_buttons:
+                            button.check_click(event)
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
@@ -366,8 +372,9 @@ class Game:
                     if self.num_gen >= MAX_NUM_GEN: # quite if training completed
                         print(self.best_bird)
                         self.best_bird.network.save_network()
-                        pygame.quit()
-                        sys.exit()
+                        # pygame.quit()
+                        # sys.exit()
+                        self.return_to_main_menu()
                         
                     self.highest_scores.sort(reverse = True)
                     Logger.info("Highest Scores (TOD) = ", self.highest_scores)
